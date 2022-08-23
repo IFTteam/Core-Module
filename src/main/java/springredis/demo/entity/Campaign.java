@@ -6,10 +6,12 @@ import springredis.demo.entity.base.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.sql.Date;
 
 @Data
 @Entity
+@Table
 public class Campaign extends BaseEntity {
     @Id
     @GeneratedValue

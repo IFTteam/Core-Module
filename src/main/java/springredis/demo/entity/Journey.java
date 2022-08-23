@@ -6,9 +6,11 @@ import springredis.demo.entity.base.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Data
+@Table
 public class Journey extends BaseEntity {
     @Id
     @GeneratedValue
@@ -19,4 +21,5 @@ public class Journey extends BaseEntity {
 
     private Integer status;
     private String stage;
+
 }

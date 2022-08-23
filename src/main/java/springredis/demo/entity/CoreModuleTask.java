@@ -3,13 +3,11 @@ package springredis.demo.entity;
 import lombok.Data;
 import springredis.demo.entity.base.BaseTaskEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @Entity
+@Table
 public class CoreModuleTask extends BaseTaskEntity {
     // Return this Entity when call core module
 

@@ -3,6 +3,7 @@ package springredis.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.ParameterResolutionDelegate;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import springredis.demo.entity.CoreModuleTask;
 import springredis.demo.entity.Journey;
@@ -15,6 +16,7 @@ import springredis.demo.repository.activeRepository.ActiveJourneyRepository;
 import springredis.demo.repository.activeRepository.ActiveNodeRepository;
 import springredis.demo.serializer.SeDeFunction;
 import springredis.demo.tasks.TaskExecutor;
+import java.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,17 +33,16 @@ public class JourneyController {
     @Autowired
     private ActiveJourneyRepository activeJourneyRepository;
 
-
     @Autowired
     private ActiveNodeRepository activeNodeRepository;
     @PostMapping("/journey/saveJourney")//保存Journey,仅仅保存Serialized部分
-    public Journey saveJourney(Journey journey){
-
+    public Journey saveJourney(@RequestBody Journey journey){
+        System.out.println(journey.getJourneySerialized());
         return journeyRepository.save(journey);
     }
 
     @PostMapping("/journey/activateJourney")//激活Journey,查取数据库，反序列化
-    public Journey activateJourney(Journey journey){
+    public Journey activateJourney(@RequestBody Journey journey){
 
 
         Optional<Journey> opsJ = journeyRepository.findById(journey.getId());
@@ -63,15 +64,17 @@ public class JourneyController {
         ActiveJourney activeJourney = new ActiveJourney();
         activeJourney.setJourneyId(journey.getId());
         activeJourneyRepository.save(activeJourney);
-
-
         //Initialize Journey function
         int n = deserializedJourney.size();
+        System.out.println(n);
+        System.out.println(deserializedJourney.get(0).getNexts());
         //1.Use map frontEndId->BackEndId and replace the node nexts frontEndId->BackEndId
         HashMap<Long,Long> keyHash = new HashMap<>();
         List<Node> heads = new ArrayList<>();
         for (int i=0; i<n; i++){
+            deserializedJourney.get(i).nextsSerialize();
             deserializedJourney.set(i,nodeRepository.save(deserializedJourney.get(i)));
+            deserializedJourney.get(i).nextsDeserialize();
             keyHash.put(deserializedJourney.get(i).getFrontEndId(),deserializedJourney.get(i).getId());
             //set up active node
             ActiveNode activeNode = new ActiveNode();
@@ -79,17 +82,20 @@ public class JourneyController {
             activeNode.setNodeId(deserializedJourney.get(i).getId());
             activeNodeRepository.save(activeNode);
         }
-
+        System.out.println(keyHash);
         // replace nexts ID
+
         for (int i=0; i<n; i++){
             Node nodeI = deserializedJourney.get(i);
             List<Long> nexts = nodeI.getNexts();
+            System.out.println(nexts);
             for (int j=0; j<nexts.size(); j++){
                 nexts.set(j, keyHash.get(nexts.get(j)));
             }
             nodeI.setNexts(nexts);
+            System.out.println(nexts);
+            nodeI.nextsSerialize();
             nodeRepository.save(deserializedJourney.get(i));
-
             if (nodeI.getHeadOrTail()==1){//add to start list if the node is a start node
                 heads.add(nodeI);
             }
@@ -104,6 +110,4 @@ public class JourneyController {
         }
         return journey;
     }
-
-
 }

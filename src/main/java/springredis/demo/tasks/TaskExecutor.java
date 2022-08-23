@@ -27,13 +27,18 @@ public class TaskExecutor implements Runnable {
 
     private NodeRepository nodeRepository;
     private RestTemplate restTemplate = new RestTemplate();
-    private HashMap<String,String> urlDict =(HashMap)Map.of(
-            "TimeDelay","http://localhost:3000",
-            "APITrigger","http://localhost:3001",
-            "End","http://localhost:3002",
-            "TimeTrigger","http://localhost:3003",
-            "SendEmail","http://localhost:3004"
-    );
+    private HashMap<String,String> urlDict = new HashMap<String,String>(){
+        {
+            put("TimeDelay","http://localhost:3000");
+            put("APITrigger","http://localhost:3001");
+            put("End","http://localhost:3002");
+            put("TimeTrigger","http://localhost:3003");
+            put("SendEmail","http://localhost:3004");
+
+        }
+
+    };
+
     public TaskExecutor(CoreModuleTask coreModuleTask) {
         this.coreModuleTask = coreModuleTask;
     }
@@ -87,8 +92,9 @@ public class TaskExecutor implements Runnable {
         baseTaskEntity.setSourceNodeId(coreModuleTask.getTargetNodeId());
         // get new target node
         if ((node.getNexts()).size()>0){
-            baseTaskEntity.setTargetNodeId((node.getNexts()).get(0));
+            baseTaskEntity.setTargetNodeId(activeNodeRepository.findByDBNodeId((node.getNexts()).get(0)).getId());
         }
+
 
         restTemplate.postForObject(urlDict.get(nodeType), baseTaskEntity, String.class);
 

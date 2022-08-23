@@ -18,16 +18,19 @@ public class TaskCoordinator implements DisposableBean,Runnable {
     private volatile boolean someCondition = true;
 
     private final String taskQueueKey = "CoretaskQueue";
-    @Autowired
+
     private RedisTemplate redisTemplate;
+
+
     private ExecutorService executorService;
 
     // dao 和service注入
     @Autowired
-    public TaskCoordinator() {
+    public TaskCoordinator(RedisTemplate redisTemplate) {
         this.thread = new Thread(this);
         this.thread.start();
         log.info("Task Coordinator Started");
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
