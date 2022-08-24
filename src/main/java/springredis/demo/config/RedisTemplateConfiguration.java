@@ -17,6 +17,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisTemplateConfiguration {
 
+    //Jedis 的连接池配置
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
 
@@ -36,6 +37,7 @@ public class RedisTemplateConfiguration {
 
 
 
+    //Redis serializer configure
     @Bean
     public RedisTemplate<Object,Object> redisTemplate (RedisConnectionFactory redisConnectionFactory){
         RedisTemplate<Object, Object>redisTemplate = new RedisTemplate<>();

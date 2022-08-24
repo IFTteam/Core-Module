@@ -94,8 +94,7 @@ public class TaskExecutor implements Runnable {
         if ((node.getNexts()).size()>0){
             baseTaskEntity.setTargetNodeId(activeNodeRepository.findByDBNodeId((node.getNexts()).get(0)).getId());
         }
-
-
+        //Call module accordingly
         restTemplate.postForObject(urlDict.get(nodeType), baseTaskEntity, String.class);
 
 

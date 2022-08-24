@@ -37,7 +37,7 @@ public class JourneyController {
     private ActiveNodeRepository activeNodeRepository;
     @PostMapping("/journey/saveJourney")//保存Journey,仅仅保存Serialized部分
     public Journey saveJourney(@RequestBody Journey journey){
-        System.out.println(journey.getJourneySerialized());
+        //System.out.println(journey.getJourneySerialized());
         return journeyRepository.save(journey);
     }
 
@@ -51,10 +51,13 @@ public class JourneyController {
             journeyRepository.save(journey);
 
 
+        }else{
+            //TODO:先sava journey, 再parse
         }
         return journey;
     }
 
+    //TODO: Node和Journey级联关系没保存，要写一下
     private Journey JourneyParse(Journey journey) {
         //Deserialize function
         SeDeFunction seDeFunction = new SeDeFunction();
@@ -104,7 +107,8 @@ public class JourneyController {
         for(int i=0; i<heads.size();i++){
             CoreModuleTask coreModuleTask = new CoreModuleTask();
             coreModuleTask.setNodeId(heads.get(i).getId());
-            coreModuleTask.setTargetNodeId(activeNodeRepository.findByDBNodeId(heads.get(i).getId()).getId());
+            //Dummy Task
+            coreModuleTask.setTargetNodeId(activeNodeRepository.findByDBNodeId(heads.get(i).getId()).getId());//Target node ->source
             TaskExecutor taskExecutor = new TaskExecutor(coreModuleTask);
             taskExecutor.callModule(heads.get(i));
         }
